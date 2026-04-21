@@ -14,7 +14,7 @@
 
 ## About the Course
 
-This is a **Python course** focused on building AI-powered applications by working directly with APIs. 
+This is a **Java course** focused on building AI-powered applications by working directly with APIs. 
 Instead of relying on tools like LangChain that abstract away the internals, we go straight to the API level. By the
 end, when you do use frameworks, you'll understand exactly what's happening under the hood.
 
@@ -39,6 +39,16 @@ end, when you do use frameworks, you'll understand exactly what's happening unde
 
 > 🚨 Pay attention that in the course we have repetitive tasks (to create agent, clients, etc.) — it's done intentionally!
 
+---
+
+## Getting Started
+
+### 1. ⭐️ **Star the repository** - it will help us grow ⭐️
+
+### 2. ⑃ Fork and clone the repository
+
+---
+
 ## Branches Structure
 
 - `main` - tasks with descriptions
@@ -49,8 +59,7 @@ end, when you do use frameworks, you'll understand exactly what's happening unde
 
 ## Prerequisites
 
-- **Python 3.11+**
-- **IDE** (PyCharm, VS Code, or any preferred editor)
+- **Java 25+**
 - **Postman** (for testing API calls)
 - **Docker** with Docker Compose
 - **API Keys** to work with different models (you will need to pay ~5-10$ credits):
@@ -58,39 +67,4 @@ end, when you do use frameworks, you'll understand exactly what's happening unde
   - **Anthropic API Key** [Generate it here](https://platform.claude.com/settings/keys) and set up as environment variable with name `ANTHROPIC_API_KEY`
   - **Gemini API Key** [Generate it here](https://aistudio.google.com/app/api-keys) and set up as environment variable with name `GEMINI_API_KEY`
 
----
-
-## Getting Started
-
-### 0. ⭐️ **Star the repository** - it will help us grow ⭐️
-
-### 1. ⑃ Fork and clone the repository
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-### 3. Activate the virtual environment
-
-**macOS / Linux:**
-
-```bash
-source .venv/bin/activate
-```
-
-**Windows:**
-
-```bash
-.venv\Scripts\activate
-```
-
-### 4. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
 
