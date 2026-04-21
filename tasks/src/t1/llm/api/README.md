@@ -20,7 +20,7 @@ libraries we commonly use.
 
 ## Task
 
-1. [Import](https://learning.postman.com/docs/getting-started/importing-and-exporting/importing-data) in Postman [collection](dial-ai-course.postman_collection.json). It will be quite useful for the further tasks. In the collection present OPENAI_API_KEY, ANTHROPIC_API_KEY and GEMINI_API_KEY environment variables, [here you can find how to configure environment in Portman](https://learning.postman.com/docs/sending-requests/variables/managing-environments)
+1. **[Import](https://learning.postman.com/docs/getting-started/importing-and-exporting/importing-data) in Postman [collection](dial-ai-course.postman_collection.json). It will be quite useful for the further tasks. In the collection present OPENAI_API_KEY, ANTHROPIC_API_KEY and GEMINI_API_KEY environment variables, [here you can find how to configure environment in Postman](https://learning.postman.com/docs/sending-requests/variables/managing-environments)**
 2. Implement [AiClient.java](AiClient.java) — abstract base class with `response()` and `streamResponse()`
 3. Implement [BaseApp.java](BaseApp.java) — interactive chat loop using Scanner
 
