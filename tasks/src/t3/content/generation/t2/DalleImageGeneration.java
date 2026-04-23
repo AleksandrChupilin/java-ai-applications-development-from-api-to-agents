@@ -76,7 +76,7 @@ public class DalleImageGeneration {
     }
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         // - Define a JSON payload for /v1/images/generations with model 'dall-e-3'
         // - Set 'prompt' to 'Smiling catdog' and experiment with 'size', 'style', and 'quality'
         // - Send a POST request to Constants.OPENAI_IMAGES_GENERATIONS_ENDPOINT

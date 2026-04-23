@@ -23,7 +23,7 @@ public class AnthropicAiClient extends AiClient {
 
     public AnthropicAiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
-        // TODO:
+        //TODO:
         // - https://github.com/anthropics/anthropic-sdk-java
         // - Build an AnthropicClient using AnthropicOkHttpClient.builder(), set apiKey, and call build()
         // - Assign the result to this.client
@@ -32,7 +32,7 @@ public class AnthropicAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build MessageCreateParams using buildParams(messages)
         // - Call client.messages().create(params)
         // - Filter the response content blocks for isText(); extract text via asText().text(); concatenate
@@ -43,7 +43,7 @@ public class AnthropicAiClient extends AiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build MessageCreateParams using buildParams(messages)
         // - Open a streaming call via client.messages().createStreaming(params) (try-with-resources)
         // - Filter events where isContentBlockDelta() is true
@@ -55,7 +55,7 @@ public class AnthropicAiClient extends AiClient {
     }
 
     private MessageCreateParams buildParams(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Create a MessageCreateParams builder; set model, system (systemPrompt), and maxTokens (e.g. 1024)
         // - Iterate messages: USER → addUserMessage(), ASSISTANT → addAssistantMessage()
         // - Build and return the params

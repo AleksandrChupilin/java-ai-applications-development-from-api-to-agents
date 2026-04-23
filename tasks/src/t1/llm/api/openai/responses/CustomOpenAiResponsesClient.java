@@ -35,7 +35,7 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://platform.openai.com/docs/api-reference/responses/create
         // - Build JSON body using buildRequestBody(messages, false)
         // - Build HttpRequest using buildRequest(body)
@@ -50,7 +50,7 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://platform.openai.com/docs/api-reference/responses/create (Streaming tab)
         // - Build JSON body using buildRequestBody(messages, true)
         // - Build HttpRequest using buildRequest(body)
@@ -67,7 +67,7 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
     }
 
     private HttpRequest buildRequest(String body) {
-        // TODO:
+        //TODO:
         // - Build an HttpRequest.Builder with URI from endpoint
         // - Add "Authorization" header using apiKey (already contains "Bearer " prefix)
         // - Add "Content-Type: application/json" header
@@ -77,7 +77,7 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
-        // TODO:
+        //TODO:
         // - Convert each Message to a map via Message.toMap() and collect to a list
         // - Build a body LinkedHashMap with "model", "instructions" (systemPrompt), and "input" (messages list)
         // - If stream is true, add "stream": true
@@ -87,7 +87,7 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
     }
 
     private String extractOutputText(JsonNode root) {
-        // TODO:
+        //TODO:
         // - Iterate over the "output" array in the root JsonNode
         // - Find items where type field equals "message"
         // - Within each such item, iterate the "content" array and find parts where type equals "output_text"

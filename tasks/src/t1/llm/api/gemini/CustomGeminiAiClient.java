@@ -42,7 +42,7 @@ public class CustomGeminiAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://ai.google.dev/api/generate-content
         // - Build the non-streaming URL: endpoint + "/" + modelName + ":generateContent"
         // - Build JSON body using buildRequestBody(messages)
@@ -58,7 +58,7 @@ public class CustomGeminiAiClient extends AiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://ai.google.dev/api/generate-content#method:-models.streamgeneratecontent
         // - Build the streaming URL: endpoint + "/" + modelName + ":streamGenerateContent?alt=sse"
         // - Build JSON body using buildRequestBody(messages)
@@ -74,7 +74,7 @@ public class CustomGeminiAiClient extends AiClient {
     }
 
     private HttpRequest buildRequest(String url, String body) {
-        // TODO:
+        //TODO:
         // - Build an HttpRequest.Builder with URI from the given url string
         // - Add "Content-Type: application/json" header
         // - Add "x-goog-api-key" header with apiKey (Gemini uses this instead of Authorization)
@@ -84,7 +84,7 @@ public class CustomGeminiAiClient extends AiClient {
     }
 
     private String buildRequestBody(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build "system_instruction" as a Map containing "parts": list of {"text": systemPrompt}
         // - Build "contents" list: for each Message, create a Map with
         //     "role": toGeminiRole(m.role()) and "parts": list of {"text": m.content()}
@@ -96,7 +96,7 @@ public class CustomGeminiAiClient extends AiClient {
     }
 
     private String extractPartsText(JsonNode candidate) {
-        // TODO:
+        //TODO:
         // - Iterate over the candidate's content.parts array
         // - For each part, extract the "text" field value and append to a StringBuilder
         // - Return the concatenated string
@@ -104,7 +104,7 @@ public class CustomGeminiAiClient extends AiClient {
     }
 
     private String toGeminiRole(Role role) {
-        // TODO:
+        //TODO:
         // - Return "model" if the role is Role.ASSISTANT (Gemini uses "model" not "assistant")
         // - Otherwise return role.getValue()
         throw new TaskNotImplementedException();

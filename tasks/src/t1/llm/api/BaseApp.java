@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class BaseApp {
 
     public static void start(boolean stream, AiClient client) {
-        // TODO:
+        //TODO:
         // - Create a new Conversation instance to maintain chat history
         // - Create a Scanner reading from System.in
         // - Print a message telling the user how to exit (e.g., type "exit")

@@ -28,7 +28,7 @@ public class SpeechToSpeech {
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         //  https://developers.openai.com/api/docs/guides/audio#add-audio-to-your-existing-application
         // - Load 'question.mp3' and encode it to base64
         // - Define a JSON payload for /v1/chat/completions with model 'gpt-4o-audio-preview'

@@ -33,7 +33,7 @@ public class CustomOpenAiChatCompletionsClient extends BaseOpenAiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://platform.openai.com/docs/api-reference/chat/create
         // - Build JSON body using buildRequestBody(messages, false)
         // - Build HttpRequest using buildRequest(body)
@@ -48,7 +48,7 @@ public class CustomOpenAiChatCompletionsClient extends BaseOpenAiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://platform.openai.com/docs/api-reference/chat/create (Streaming tab)
         // - Build JSON body using buildRequestBody(messages, true)
         // - Build HttpRequest using buildRequest(body)
@@ -64,7 +64,7 @@ public class CustomOpenAiChatCompletionsClient extends BaseOpenAiClient {
     }
 
     private HttpRequest buildRequest(String body) {
-        // TODO:
+        //TODO:
         // - Build an HttpRequest.Builder with URI from endpoint
         // - Add "Authorization" header using apiKey (already contains "Bearer " prefix)
         // - Add "Content-Type: application/json" header
@@ -74,7 +74,7 @@ public class CustomOpenAiChatCompletionsClient extends BaseOpenAiClient {
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
-        // TODO:
+        //TODO:
         // - Create a messages list; prepend the system message as Map("role"->"system", "content"->systemPrompt)
         // - Convert each Message to a map via Message.toMap() and append
         // - Build a body LinkedHashMap with "model" and "messages" keys

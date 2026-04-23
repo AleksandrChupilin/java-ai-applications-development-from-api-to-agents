@@ -26,7 +26,7 @@ public class ImageAnalysis {
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         //  https://developers.openai.com/api/docs/guides/images-vision?format=url&lang=curl
         //  https://developers.openai.com/api/docs/guides/images-vision?format=base64-encoded
         // - Encode local 'logo.png' to a base64 data URL

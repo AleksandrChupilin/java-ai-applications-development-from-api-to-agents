@@ -50,7 +50,7 @@ public class TextToSpeech {
     }
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         // - Define a JSON payload for /v1/audio/speech with model 'gpt-4o-mini-tts'
         // - Set 'input' text and choose a voice from the Voice enum
         // - Send a POST request to Constants.OPENAI_AUDIO_SPEECH_ENDPOINT

@@ -29,7 +29,7 @@ public class GeminiAiClient extends AiClient {
 
     public GeminiAiClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
-        // TODO:
+        //TODO:
         // https://github.com/googleapis/java-genai
         // - Build a Client using Client.builder(), set apiKey, and call build()
         // - Assign the result to this.client
@@ -38,7 +38,7 @@ public class GeminiAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build GenerateContentConfig using buildConfig()
         // - Build the contents list using buildContents(messages)
         // - Call client.models.generateContent(modelName, contents, config)
@@ -50,7 +50,7 @@ public class GeminiAiClient extends AiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build GenerateContentConfig using buildConfig()
         // - Build the contents list using buildContents(messages)
         // - Open a streaming call via client.models.generateContentStream(modelName, contents, config) (try-with-resources)
@@ -62,7 +62,7 @@ public class GeminiAiClient extends AiClient {
     }
 
     private GenerateContentConfig buildConfig() {
-        // TODO:
+        //TODO:
         // - Build a GenerateContentConfig with systemInstruction set to a Content containing Part.fromText(systemPrompt)
         // - Set maxOutputTokens
         // - Build and return the config
@@ -70,7 +70,7 @@ public class GeminiAiClient extends AiClient {
     }
 
     private List<Content> buildContents(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - For each Message, build a Content with:
         //   - role: toGeminiRole(m.role())
         //   - parts: a single Part.fromText(m.content())
@@ -79,7 +79,7 @@ public class GeminiAiClient extends AiClient {
     }
 
     private String toGeminiRole(Role role) {
-        // TODO:
+        //TODO:
         // - Return "model" if the role is Role.ASSISTANT (Gemini uses "model" not "assistant")
         // - Otherwise return role.getValue()
         throw new TaskNotImplementedException();

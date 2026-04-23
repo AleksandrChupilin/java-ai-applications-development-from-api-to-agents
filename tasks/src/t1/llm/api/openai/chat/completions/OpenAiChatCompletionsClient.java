@@ -23,7 +23,7 @@ public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
 
     public OpenAiChatCompletionsClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
-        // TODO:
+        //TODO:
         // https://github.com/openai/openai-java
         // - Call super(endpoint, modelName, apiKey, systemPrompt)
         // - Build an OpenAIClient using OpenAIOkHttpClient.builder(), set apiKey, and call build()
@@ -32,7 +32,7 @@ public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build ChatCompletionCreateParams using buildParams(messages)
         // - Call client.chat().completions().create(params)
         // - Extract content string from choices[0].message.content() (throw if absent)
@@ -43,7 +43,7 @@ public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build ChatCompletionCreateParams using buildParams(messages)
         // - Open a streaming call via client.chat().completions().createStreaming(params) (try-with-resources)
         // - For each chunk, extract delta content from choices[0].delta.content()
@@ -54,7 +54,7 @@ public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
     }
 
     private ChatCompletionCreateParams buildParams(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Create a ChatCompletionCreateParams builder; set model and add the system message (systemPrompt)
         // - Iterate messages: USER → addUserMessage(), ASSISTANT → addMessage() with ChatCompletionAssistantMessageParam
         // - Build and return the params

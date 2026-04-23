@@ -27,7 +27,7 @@ public class GptImageGeneration {
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         // - Define a JSON payload for /v1/images/generations with model 'gpt-image-1'
         // - Set 'prompt' to 'Smiling catdog'
         // - Send a POST request to Constants.OPENAI_IMAGES_GENERATIONS_ENDPOINT

@@ -26,7 +26,7 @@ public class SpeechToText {
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     public static void main(String[] args) throws Exception {
-        // TODO:
+        //TODO:
         //  https://developers.openai.com/api/docs/guides/speech-to-text
         // - Load 'audio_sample.mp3' and define the model (e.g., 'whisper-1')
         // - Build a multipart/form-data request body manually (including boundary and fields)

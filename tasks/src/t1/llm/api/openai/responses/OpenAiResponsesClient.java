@@ -27,14 +27,14 @@ public class OpenAiResponsesClient extends BaseOpenAiClient {
 
     public OpenAiResponsesClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
-        // TODO:
+        //TODO:
         // - Build an OpenAIClient using OpenAIOkHttpClient.builder(), set apiKey, and call build()
         // - Assign the result to this.client
     }
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build ResponseCreateParams using buildParams(messages)
         // - Call client.responses().create(params)
         // - Find the output item where isMessage() is true; find the content part where isOutputText() is true
@@ -46,7 +46,7 @@ public class OpenAiResponsesClient extends BaseOpenAiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - Build ResponseCreateParams using buildParams(messages)
         // - Open a streaming call via client.responses().createStreaming(params) (try-with-resources)
         // - Filter events where isOutputTextDelta() is true; extract delta text via asOutputTextDelta().delta()
@@ -57,7 +57,7 @@ public class OpenAiResponsesClient extends BaseOpenAiClient {
     }
 
     private ResponseCreateParams buildParams(List<Message> messages) {
-        // TODO:
+        //TODO:
         // - For each Message, build a ResponseInputItem via ResponseInputItem.ofEasyInputMessage()
         //   using EasyInputMessage.builder() with role (EasyInputMessage.Role.of(role.getValue())) and content
         // - Build ResponseCreateParams with:

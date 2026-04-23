@@ -42,7 +42,7 @@ public class CustomAnthropicAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://docs.anthropic.com/en/api/messages
         // - Build JSON body using buildRequestBody(messages, false)
         // - Build HttpRequest using buildRequest(body)
@@ -57,7 +57,7 @@ public class CustomAnthropicAiClient extends AiClient {
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        // TODO:
+        //TODO:
         // https://docs.anthropic.com/en/api/messages-streaming
         // - Build JSON body using buildRequestBody(messages, true)
         // - Build HttpRequest using buildRequest(body)
@@ -73,7 +73,7 @@ public class CustomAnthropicAiClient extends AiClient {
     }
 
     private HttpRequest buildRequest(String body) {
-        // TODO:
+        //TODO:
         // - Build an HttpRequest.Builder with URI from endpoint
         // - Add "x-api-key" header with apiKey (Anthropic does NOT use "Bearer " prefix)
         // - Add "Content-Type: application/json" header
@@ -84,7 +84,7 @@ public class CustomAnthropicAiClient extends AiClient {
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
-        // TODO:
+        //TODO:
         // - Build a body LinkedHashMap with "model", "system" (systemPrompt), "max_tokens" (e.g. 1024)
         // - Convert each Message to a map via Message.toMap() and set as "messages"
         // - If stream is true, add "stream": true
