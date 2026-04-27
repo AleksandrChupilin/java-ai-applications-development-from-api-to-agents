@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.Base64;
 
 // https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html
+// https://docs.spring.io/spring-ai/reference/api/mcp/mcp-annotations-server.html
 @Component
 public class UmsMcpServer {
 
