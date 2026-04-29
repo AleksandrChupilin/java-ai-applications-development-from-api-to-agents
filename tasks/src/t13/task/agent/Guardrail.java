@@ -10,19 +10,28 @@ public class Guardrail {
 
     private static final String REDACTED = "***";
 
-    //TODO:
-    // - Define PATTERNS as a Pattern array containing compiled regex patterns to redact PII:
-    //   - Credit card num — Python-dict format: 'num': 'xxxx-xxxx-xxxx-xxxx'
-    //   - Credit card num — JSON format: "num": "xxxx-xxxx-xxxx-xxxx"
-    //   - Credit card num — standalone: 16 digits in 4 groups separated by '-' or space
-    //   - CVV — Python-dict format: 'cvv': 'ddd'
-    //   - CVV — JSON format: "cvv": "ddd"
-    //   - Expiry date — Python-dict format: 'exp_date': 'MM/YYYY'
-    //   - Expiry date — JSON format: "exp_date": "MM/YYYY"
-    //   - Salary — YAML/plain format: salary: 12345
-    //   - Salary — JSON format: "salary": 12345
-    //   - Salary — Python-dict format: 'salary': 12345
-    private static final Pattern[] PATTERNS = {};
+    private static final Pattern[] PATTERNS = {
+            // Credit card number — Python dict: 'num': 'xxxx-xxxx-xxxx-xxxx'
+            Pattern.compile("(?<='num': ')\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}(?=')"),
+            // Credit card number — JSON: "num": "xxxx-xxxx-xxxx-xxxx"
+            Pattern.compile("(?<=\"num\": \")\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}(?=\")"),
+            // Credit card number — standalone
+            Pattern.compile("\\b\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}[-\\s]\\d{4}\\b"),
+            // CVV — Python dict: 'cvv': '259'
+            Pattern.compile("(?<='cvv': ')\\d{3,4}(?=')"),
+            // CVV — JSON: "cvv": "259"
+            Pattern.compile("(?<=\"cvv\": \")\\d{3,4}(?=\")"),
+            // Expiry date — Python dict: 'exp_date': '08/2029'
+            Pattern.compile("(?<='exp_date': ')\\d{2}/\\d{4}(?=')"),
+            // Expiry date — JSON: "exp_date": "08/2029"
+            Pattern.compile("(?<=\"exp_date\": \")\\d{2}/\\d{4}(?=\")"),
+            // Salary — YAML/plain: salary: 85000
+            Pattern.compile("(?<=salary: )\\d[\\d,]*(?:\\.\\d+)?"),
+            // Salary — JSON: "salary": 85000
+            Pattern.compile("(?<=\"salary\": )\\d[\\d,]*(?:\\.\\d+)?"),
+            // Salary — Python dict: 'salary': 85000
+            Pattern.compile("(?<='salary': )\\d[\\d,]*(?:\\.\\d+)?"),
+    };
 
     public String redact(String text) {
         //TODO:
