@@ -28,7 +28,7 @@ public class GptImageGeneration {
 
     public static void main(String[] args) throws Exception {
         //TODO:
-        // - Define a JSON payload for /v1/images/generations with model 'gpt-image-1'
+        // - Define a JSON payload for /v1/images/generations with model 'gpt-image-2'
         // - Set 'prompt' to 'Smiling catdog'
         // - Send a POST request to Constants.OPENAI_IMAGES_GENERATIONS_ENDPOINT
         // - Extract 'b64_json' from the response, decode it, and save as a .png file
@@ -42,7 +42,7 @@ public class GptImageGeneration {
 //      -H "Authorization: Bearer $OPENAI_API_KEY" \
 //      -H "Content-type: application/json" \
 //      -d '{
-//          "model": "gpt-image-1",
+//          "model": "gpt-image-2",
 //          "prompt": "smiling catdog."
 //      }'
 //  Response:
