@@ -1,8 +1,10 @@
 package t1.llm.api.gemini;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.exceptions.TaskNotImplementedException;
+import org.springframework.util.StringUtils;
 import t1.llm.api.AiClient;
 import commons.model.Message;
 import commons.model.Role;
@@ -11,12 +13,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import static commons.Constants.GEMINI_ENDPOINT;
 
 /**
  * Google Gemini client using raw HTTP — no official stable Java SDK available.
@@ -42,71 +45,90 @@ public class CustomGeminiAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        //TODO:
-        // https://ai.google.dev/api/generate-content
-        // - Build the non-streaming URL: endpoint + "/" + modelName + ":generateContent"
-        // - Build JSON body using buildRequestBody(messages)
-        // - Build HttpRequest using buildRequest(url, body)
-        // - Send with HttpClient using BodyHandlers.ofString()
-        // - Throw RuntimeException if response status is not 200
-        // - Parse JSON with ObjectMapper; access candidates[0]; extract text using extractPartsText()
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String url = "%s/%s:generateContent".formatted(GEMINI_ENDPOINT, modelName);
+        String body = buildRequestBody(messages);
+        HttpRequest request = buildRequest(url, body);
+        try {
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Request failed with status code: " + response.statusCode() + ", body: " + response.body());
+            }
+            String content = extractPartsText(MAPPER.readTree(response.body()).path("candidates").get(0));
+            System.out.println(content);
+            return new Message(Role.ASSISTANT, content);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        //TODO:
         // https://ai.google.dev/api/generate-content#method:-models.streamgeneratecontent
-        // - Build the streaming URL: endpoint + "/" + modelName + ":streamGenerateContent?alt=sse"
-        // - Build JSON body using buildRequestBody(messages)
-        // - Build HttpRequest using buildRequest(url, body)
-        // - Send with HttpClient using BodyHandlers.ofLines()
-        // - Iterate lines starting with "data: "; parse JSON from each
-        // - Access the "candidates" array; extract text from candidates[0] using extractPartsText()
-        // - Print each non-empty text to stdout; accumulate in a StringBuilder
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String url = "%s/%s:streamGenerateContent?alt=sse".formatted(GEMINI_ENDPOINT, modelName);
+        String body = buildRequestBody(messages);
+        HttpRequest request = buildRequest(url, body);
+        StringBuilder accumulatedContent = new StringBuilder();
+        try {
+            HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
+            Iterator<String> lineIterator = response.body().iterator();
+            while (lineIterator.hasNext()) {
+                String line = lineIterator.next();
+                if (!line.startsWith("data: ")) {
+                    continue;
+                }
+                String chunkText = extractPartsText(MAPPER.readTree(line.substring("data: ".length())).path("candidates").get(0));
+                if (StringUtils.hasText(chunkText)) {
+                    System.out.print(chunkText);
+                    accumulatedContent.append(chunkText);
+                }
+            }
+            System.out.println();
+            return new Message(Role.ASSISTANT, accumulatedContent.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     private HttpRequest buildRequest(String url, String body) {
-        //TODO:
-        // - Build an HttpRequest.Builder with URI from the given url string
-        // - Add "Content-Type: application/json" header
-        // - Add "x-goog-api-key" header with apiKey (Gemini uses this instead of Authorization)
-        // - Set POST body with HttpRequest.BodyPublishers.ofString(body)
-        // - Build and return the HttpRequest
-        throw new TaskNotImplementedException();
+        return HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .header("x-goog-api-key", apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
     }
 
     private String buildRequestBody(List<Message> messages) {
-        //TODO:
-        // - Build "system_instruction" as a Map containing "parts": list of {"text": systemPrompt}
-        // - Build "contents" list: for each Message, create a Map with
-        //     "role": toGeminiRole(m.role()) and "parts": list of {"text": m.content()}
-        // - Build a body LinkedHashMap with "system_instruction", "contents",
-        //   and "generationConfig" containing "maxOutputTokens"
-        // - Serialize to JSON string with ObjectMapper and return
-        // - Wrap checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        Map<String, List<Map<String, String>>> systemInstruction = Map.of("parts", List.of(Map.of("text", systemPrompt)));
+        List<Map<String, Object>> contents = messages.stream()
+                .map(message -> Map.of(
+                        "role",  toGeminiRole(message.role()),
+                        "parts", List.of(Map.of("text", message.content()))
+                ))
+                .toList();
+        Map<String, Object> body = new LinkedHashMap<>(3);
+        body.put("system_instruction", systemInstruction);
+        body.put("contents", contents);
+        body.put("generationConfig", Map.of("maxOutputTokens", 1024));
+        try {
+            return MAPPER.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize Gemini request body", e);
+        }
     }
 
     private String extractPartsText(JsonNode candidate) {
-        //TODO:
-        // - Iterate over the candidate's content.parts array
-        // - For each part, extract the "text" field value and append to a StringBuilder
-        // - Return the concatenated string
-        throw new TaskNotImplementedException();
+        StringBuilder content = new StringBuilder();
+        JsonNode parts = candidate.path("content").path("parts");
+        if (parts.isArray()) {
+            for (JsonNode part : parts) {
+                content.append(part.path("text").asText(""));
+            }
+        }
+        return content.toString();
     }
 
     private String toGeminiRole(Role role) {
-        //TODO:
-        // - Return "model" if the role is Role.ASSISTANT (Gemini uses "model" not "assistant")
-        // - Otherwise return role.getValue()
-        throw new TaskNotImplementedException();
+        return Role.ASSISTANT.equals(role) ? "model" : role.getValue();
     }
 }
