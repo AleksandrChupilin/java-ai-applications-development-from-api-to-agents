@@ -2,7 +2,6 @@ package t1.llm.api.anthropic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import commons.exceptions.TaskNotImplementedException;
 import t1.llm.api.AiClient;
 import commons.model.Message;
 import commons.model.Role;
@@ -42,54 +41,112 @@ public class CustomAnthropicAiClient extends AiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        //TODO:
         // https://docs.anthropic.com/en/api/messages
-        // - Build JSON body using buildRequestBody(messages, false)
-        // - Build HttpRequest using buildRequest(body)
-        // - Send with HttpClient using BodyHandlers.ofString()
-        // - Throw RuntimeException if response status is not 200
-        // - Parse JSON with ObjectMapper; iterate the "content" array; collect text from blocks where type == "text"
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String body = buildRequestBody(messages, false);
+        HttpRequest request = buildRequest(body);
+        try {
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Request failed with status code: " + response.statusCode() + ", body: " + response.body());
+            }
+
+            JsonNode root = MAPPER.readTree(response.body());
+            StringBuilder content = new StringBuilder();
+            JsonNode blocks = root.path("content");
+            if (blocks.isArray()) {
+                for (JsonNode block : blocks) {
+                    if ("text".equals(block.path("type").asText())) {
+                        content.append(block.path("text").asText(""));
+                    }
+                }
+            }
+
+            String text = content.toString();
+            System.out.println(text);
+            return new Message(Role.ASSISTANT, text);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        //TODO:
         // https://docs.anthropic.com/en/api/messages-streaming
-        // - Build JSON body using buildRequestBody(messages, true)
-        // - Build HttpRequest using buildRequest(body)
-        // - Send with HttpClient using BodyHandlers.ofLines()
-        // - Iterate lines starting with "data: "; parse JSON from each
-        // - For events with type "content_block_delta" where delta.type == "text_delta": extract delta.text
-        // - Print each non-empty text to stdout; accumulate in a StringBuilder
-        // - Stop the loop early when event type is "message_stop"
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String body = buildRequestBody(messages, true);
+        HttpRequest request = buildRequest(body);
+        StringBuilder accumulatedContent = new StringBuilder();
+
+        try {
+            HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Request failed with status code: " + response.statusCode());
+            }
+
+            Iterator<String> iterator = response.body().iterator();
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                if (!line.startsWith("data: ")) {
+                    continue;
+                }
+
+                String payload = line.substring("data: ".length()).strip();
+                if (payload.isEmpty()) {
+                    continue;
+                }
+
+                JsonNode event = MAPPER.readTree(payload);
+                String eventType = event.path("type").asText("");
+                if ("message_stop".equals(eventType)) {
+                    break;
+                }
+
+                if (!"content_block_delta".equals(eventType)) {
+                    continue;
+                }
+
+                JsonNode delta = event.path("delta");
+                if (!"text_delta".equals(delta.path("type").asText(""))) {
+                    continue;
+                }
+
+                String text = delta.path("text").asText("");
+                if (!text.isBlank()) {
+                    System.out.print(text);
+                    accumulatedContent.append(text);
+                }
+            }
+
+            System.out.println();
+            return new Message(Role.ASSISTANT, accumulatedContent.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     private HttpRequest buildRequest(String body) {
-        //TODO:
-        // - Build an HttpRequest.Builder with URI from endpoint
-        // - Add "x-api-key" header with apiKey (Anthropic does NOT use "Bearer " prefix)
-        // - Add "Content-Type: application/json" header
-        // - Add "anthropic-version: 2023-06-01" header (required by Anthropic API)
-        // - Set POST body with HttpRequest.BodyPublishers.ofString(body)
-        // - Build and return the HttpRequest
-        throw new TaskNotImplementedException();
+        return HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("x-api-key", apiKey)
+                .header("Content-Type", "application/json")
+                .header("anthropic-version", "2023-06-01")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
-        //TODO:
-        // - Build a body LinkedHashMap with "model", "system" (systemPrompt), "max_tokens" (e.g. 1024)
-        // - Convert each Message to a map via Message.toMap() and set as "messages"
-        // - If stream is true, add "stream": true
-        // - Serialize to JSON string with ObjectMapper and return
-        // - Wrap checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("model", modelName);
+        body.put("system", systemPrompt);
+        body.put("max_tokens", 1024);
+        body.put("messages", messages.stream().map(Message::toMap).toList());
+        if (stream) {
+            body.put("stream", true);
+        }
+
+        try {
+            return MAPPER.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Anthropic request body", e);
+        }
     }
 }
