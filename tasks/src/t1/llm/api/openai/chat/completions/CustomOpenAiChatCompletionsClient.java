@@ -67,7 +67,7 @@ public class CustomOpenAiChatCompletionsClient extends BaseOpenAiClient {
             HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
             response.body()
                     .filter(line -> line.startsWith("data: "))
-                    .map(line -> line.substring("data: ".length()).strip())
+                    .map(line -> line.substring("data: ".length()))
                     .takeWhile(data -> !"[DONE]".equals(data))
                     .forEach(data -> {
                         try {

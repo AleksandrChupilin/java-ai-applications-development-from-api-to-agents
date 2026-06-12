@@ -2,7 +2,6 @@ package t1.llm.api.openai.responses;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import commons.exceptions.TaskNotImplementedException;
 import commons.model.Message;
 import commons.model.Role;
 import t1.llm.api.openai.BaseOpenAiClient;
@@ -35,64 +34,130 @@ public class CustomOpenAiResponsesClient extends BaseOpenAiClient {
 
     @Override
     public Message response(List<Message> messages) {
-        //TODO:
         // https://platform.openai.com/docs/api-reference/responses/create
-        // - Build JSON body using buildRequestBody(messages, false)
-        // - Build HttpRequest using buildRequest(body)
-        // - Send with HttpClient using BodyHandlers.ofString()
-        // - Throw RuntimeException if response status is not 200
-        // - Parse JSON with ObjectMapper; extract output text using extractOutputText()
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String body = buildRequestBody(messages, false);
+        HttpRequest request = buildRequest(body);
+        try {
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException(
+                        "Request failed with status code: " + response.statusCode() + ", body: " + response.body()
+                );
+            }
+            String content = extractOutputText(MAPPER.readTree(response.body()));
+            System.out.println(content);
+            return new Message(Role.ASSISTANT, content);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        //TODO:
         // https://platform.openai.com/docs/api-reference/responses/create (Streaming tab)
-        // - Build JSON body using buildRequestBody(messages, true)
-        // - Build HttpRequest using buildRequest(body)
-        // - Send with HttpClient using BodyHandlers.ofLines()
-        // - Iterate over lines, tracking the current SSE event type (lines starting with "event: ")
-        // - For "data: " lines where current event type is "response.output_text.delta":
-        //   parse JSON with ObjectMapper and extract the "delta" field text
-        // - Print each non-empty delta to stdout; accumulate in a StringBuilder
-        // - Reset current event tracker on empty lines
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
-        // - Wrap all checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        String body = buildRequestBody(messages, true);
+        HttpRequest request = buildRequest(body);
+        StringBuilder accumulatedContent = new StringBuilder();
+        String currentEvent = null;
+
+        try {
+            HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Request failed with status code: " + response.statusCode());
+            }
+
+            Iterator<String> iterator = response.body().iterator();
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+
+                if (line.isEmpty()) {
+                    currentEvent = null;
+                    continue;
+                }
+
+                if (line.startsWith("event: ")) {
+                    currentEvent = line.substring("event: ".length()).strip();
+                    continue;
+                }
+
+                if (!line.startsWith("data: ") || !"response.output_text.delta".equals(currentEvent)) {
+                    continue;
+                }
+
+                String data = line.substring("data: ".length());
+                if ("[DONE]".equals(data)) {
+                    break;
+                }
+
+                String delta = MAPPER.readTree(data).path("delta").asText("");
+                if (!delta.isBlank()) {
+                    System.out.print(delta);
+                    accumulatedContent.append(delta);
+                }
+            }
+            System.out.println();
+            return new Message(Role.ASSISTANT, accumulatedContent.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error during API request: " + e.getMessage(), e);
+        }
     }
 
     private HttpRequest buildRequest(String body) {
-        //TODO:
-        // - Build an HttpRequest.Builder with URI from endpoint
-        // - Add "Authorization" header using apiKey (already contains "Bearer " prefix)
-        // - Add "Content-Type: application/json" header
-        // - Set POST body with HttpRequest.BodyPublishers.ofString(body)
-        // - Build and return the HttpRequest
-        throw new TaskNotImplementedException();
+        return HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
     }
 
     private String buildRequestBody(List<Message> messages, boolean stream) {
-        //TODO:
-        // - Convert each Message to a map via Message.toMap() and collect to a list
-        // - Build a body LinkedHashMap with "model", "instructions" (systemPrompt), and "input" (messages list)
-        // - If stream is true, add "stream": true
-        // - Serialize to JSON string with ObjectMapper and return
-        // - Wrap checked exceptions in RuntimeException
-        throw new TaskNotImplementedException();
+        List<Map<String, Object>> input = messages.stream()
+                .map(Message::toMap)
+                .toList();
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("model", modelName);
+        body.put("instructions", systemPrompt);
+        body.put("input", input);
+        if (stream) {
+            body.put("stream", true);
+        }
+
+        try {
+            return MAPPER.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Responses request body", e);
+        }
     }
 
     private String extractOutputText(JsonNode root) {
-        //TODO:
-        // - Iterate over the "output" array in the root JsonNode
-        // - Find items where type field equals "message"
-        // - Within each such item, iterate the "content" array and find parts where type equals "output_text"
-        // - Return the "text" field value from the first matching part
-        // - Throw RuntimeException if no output text is found
-        throw new TaskNotImplementedException();
+        JsonNode output = root.path("output");
+        if (!output.isArray()) {
+            throw new RuntimeException("No output array in Responses API response");
+        }
+
+        for (JsonNode item : output) {
+            if (!"message".equals(item.path("type").asText())) {
+                continue;
+            }
+
+            JsonNode content = item.path("content");
+            if (!content.isArray()) {
+                continue;
+            }
+
+            for (JsonNode part : content) {
+                if (!"output_text".equals(part.path("type").asText())) {
+                    continue;
+                }
+                String text = part.path("text").asText(null);
+                if (text != null) {
+                    return text;
+                }
+            }
+        }
+
+        throw new RuntimeException("No output text found in Responses API response");
     }
 }

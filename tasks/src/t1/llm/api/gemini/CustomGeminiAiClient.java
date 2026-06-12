@@ -70,7 +70,7 @@ public class CustomGeminiAiClient extends AiClient {
             HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
             response.body()
                     .filter(line -> line.startsWith("data: "))
-                    .map(line -> line.substring("data: ".length()).strip())
+                    .map(line -> line.substring("data: ".length()))
                     .forEach(data -> {
                         try {
                             String chunkText = extractPartsText(MAPPER.readTree(data).path("candidates").get(0));
