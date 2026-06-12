@@ -3,7 +3,6 @@ package t1.llm.api.gemini;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import commons.exceptions.TaskNotImplementedException;
 import org.springframework.util.StringUtils;
 import t1.llm.api.AiClient;
 import commons.model.Message;
@@ -13,7 +12,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,18 +68,20 @@ public class CustomGeminiAiClient extends AiClient {
         StringBuilder accumulatedContent = new StringBuilder();
         try {
             HttpResponse<Stream<String>> response = http.send(request, HttpResponse.BodyHandlers.ofLines());
-            Iterator<String> lineIterator = response.body().iterator();
-            while (lineIterator.hasNext()) {
-                String line = lineIterator.next();
-                if (!line.startsWith("data: ")) {
-                    continue;
-                }
-                String chunkText = extractPartsText(MAPPER.readTree(line.substring("data: ".length())).path("candidates").get(0));
-                if (StringUtils.hasText(chunkText)) {
-                    System.out.print(chunkText);
-                    accumulatedContent.append(chunkText);
-                }
-            }
+            response.body()
+                    .filter(line -> line.startsWith("data: "))
+                    .map(line -> line.substring("data: ".length()).strip())
+                    .forEach(data -> {
+                        try {
+                            String chunkText = extractPartsText(MAPPER.readTree(data).path("candidates").get(0));
+                            if (StringUtils.hasText(chunkText)) {
+                                System.out.print(chunkText);
+                                accumulatedContent.append(chunkText);
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException("Failed to parse Gemini stream chunk", e);
+                        }
+                    });
             System.out.println();
             return new Message(Role.ASSISTANT, accumulatedContent.toString());
         } catch (Exception e) {

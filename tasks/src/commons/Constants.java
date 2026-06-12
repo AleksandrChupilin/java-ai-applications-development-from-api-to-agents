@@ -39,7 +39,7 @@ public final class Constants {
 
     public static final String CLAUDE_SONNET_4_5 = "claude-sonnet-4-5";
     public static final String GEMINI_3_FLASH_PREVIEW = "gemini-3-flash-preview";
-    public static final String GPT_5_4 = "gpt-5.4";
+    public static final String GPT_5_4 = "gpt-5.4-mini";
     public static final String GPT_4_1_NANO = "gpt-4.1-nano";
     public static final String GPT_4O_MINI = "gpt-4o-mini";
 

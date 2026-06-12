@@ -2,9 +2,11 @@ package t1.llm.api.openai.chat.completions;
 
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.core.http.StreamResponse;
+import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
+import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import commons.exceptions.TaskNotImplementedException;
 import commons.model.Message;
 import commons.model.Role;
 import t1.llm.api.openai.BaseOpenAiClient;
@@ -19,45 +21,67 @@ import java.util.List;
  */
 public class OpenAiChatCompletionsClient extends BaseOpenAiClient {
 
-    private OpenAIClient client;
+    private final OpenAIClient client;
 
     public OpenAiChatCompletionsClient(String endpoint, String modelName, String apiKey, String systemPrompt) {
         super(endpoint, modelName, apiKey, systemPrompt);
-        //TODO:
         // https://github.com/openai/openai-java
-        // - Call super(endpoint, modelName, apiKey, systemPrompt)
-        // - Build an OpenAIClient using OpenAIOkHttpClient.builder(), set apiKey, and call build()
-        // - Assign the result to this.client
+        this.client = OpenAIOkHttpClient.builder()
+                .apiKey(apiKey)
+                .build();
     }
 
     @Override
     public Message response(List<Message> messages) {
-        //TODO:
-        // - Build ChatCompletionCreateParams using buildParams(messages)
-        // - Call client.chat().completions().create(params)
-        // - Extract content string from choices[0].message.content() (throw if absent)
-        // - Print content to stdout
-        // - Return new Message(Role.ASSISTANT, content)
-        throw new TaskNotImplementedException();
+        ChatCompletionCreateParams params = buildParams(messages);
+        ChatCompletion chatCompletion = client.chat().completions().create(params);
+        String content = chatCompletion.choices().stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No choices returned"))
+                .message()
+                .content()
+                .orElseThrow(() -> new RuntimeException("No content in response"));
+        System.out.println(content);
+        return new Message(Role.ASSISTANT, content);
     }
 
     @Override
     public Message streamResponse(List<Message> messages) {
-        //TODO:
-        // - Build ChatCompletionCreateParams using buildParams(messages)
-        // - Open a streaming call via client.chat().completions().createStreaming(params) (try-with-resources)
-        // - For each chunk, extract delta content from choices[0].delta.content()
-        // - Print each non-empty delta token to stdout; accumulate in a StringBuilder
-        // - Print a newline after the stream ends
-        // - Return new Message(Role.ASSISTANT, accumulated content)
-        throw new TaskNotImplementedException();
+        ChatCompletionCreateParams params = buildParams(messages);
+        StringBuilder accumulatedContent = new StringBuilder();
+        try (StreamResponse<ChatCompletionChunk> streamResponse = client.chat().completions().createStreaming(params)) {
+            streamResponse.stream().forEach(chunk -> {
+                String deltaContent = chunk.choices().stream()
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("No choices in chunk"))
+                        .delta()
+                        .content()
+                        .orElse("");
+                if (!deltaContent.isEmpty()) {
+                    System.out.print(deltaContent);
+                    accumulatedContent.append(deltaContent);
+                }
+            });
+        }
+        System.out.println();
+        return new Message(Role.ASSISTANT, accumulatedContent.toString());
     }
 
     private ChatCompletionCreateParams buildParams(List<Message> messages) {
-        //TODO:
-        // - Create a ChatCompletionCreateParams builder; set model and add the system message (systemPrompt)
-        // - Iterate messages: USER → addUserMessage(), ASSISTANT → addMessage() with ChatCompletionAssistantMessageParam
-        // - Build and return the params
-        throw new TaskNotImplementedException();
+        ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder()
+                .model(modelName)
+                .addSystemMessage(systemPrompt);
+
+        messages.forEach(message -> {
+            if (Role.ASSISTANT.equals(message.role())) {
+                builder.addMessage(ChatCompletionAssistantMessageParam.builder()
+                        .content(message.content())
+                        .build());
+            } else if (Role.USER.equals(message.role())) {
+                builder.addUserMessage(message.content());
+
+            }
+        });
+        return builder.build();
     }
 }
